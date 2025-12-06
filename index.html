@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./assets/Cosmos-Logo.png" />
+  <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+
+  <title id="title">Cosmos</title>
+
+  <link rel="stylesheet" href="./main.css" />
+  <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+</head>
+<body>
+  <div id="notifBanner" onclick="output.scroll({top: 1000000, left: 0, behavior: 'smooth'})"></div>
+  <audio src="./assets/ping.mp3" id="pinger" preload="auto"></audio>
+  <noscript>Your browser does not support the world of Cosmos!</noscript>
+  <div id="output"></div>
+  <script src="./client.js"></script>
+
+  <button class="Info" onclick="popup_info()"><img src="./assets/info.svg"></button>
+
+  <div class="msgBar">
+    <input type="text" placeholder="Type here to communicate to the universe" id="msg-box" autocomplete="on" autocorrect="on" autocapitalize="on" spellcheck="true" />
+    <button onclick="send()" aria-label="Send">
+      <img src="./assets/send-Arrow.svg" alt="Send" />
+    </button>
+  </div>
+</body>
+</html>

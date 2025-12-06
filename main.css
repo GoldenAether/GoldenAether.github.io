@@ -1,0 +1,201 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #0B0F2D;
+  --txt: #E0E7FF;
+  --accent: #7F5AF0;
+  --highlight: #FFD700;
+  --radius: 25px;
+  --font-family: 'Kanit', Verdana, Geneva, Tahoma, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  background-color: var(--bg);
+  color: var(--txt);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#output {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 12px;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+/* Chat bubbles */
+.message {
+  max-width: 75vw;
+  margin: 6px;
+  padding: 12px 20px;
+  border-radius: var(--radius);
+  background-color: rgba(127, 90, 240, 0.45);
+  color: var(--txt);
+  user-select: text;
+  word-break: break-word;
+}
+.servMsgCont{
+    color: var(--server-img);
+    display: flex;
+    justify-content: space-around;
+}
+.message.sent {
+  background-color: var(--accent);
+  margin-left: auto;
+  text-align: right;
+  border-radius: var(--radius) var(--radius) 0 var(--radius);
+}
+
+.message.received {
+  background-color: rgba(255 255 255 / 0.18);
+  color: var(--txt);
+  margin-right: auto;
+  text-align: left;
+  border-radius: var(--radius) var(--radius) var(--radius) 0;
+}
+
+.username {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--highlight);
+  margin-bottom: 6px;
+  user-select: text;
+}
+
+/* Input bar fixed bottom */
+.msgBar {
+  display: flex;
+  padding: 8px 16px;
+  background-color: var(--bg);
+  border-top: 1px solid var(--accent);
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  gap: 12px;
+}
+
+.msgBar input[type="text"] {
+  flex: 1;
+  height: 40px;
+  border-radius: 25px;
+  border: none;
+  padding: 0 16px;
+  font-size: 1rem;
+  color: var(--txt);
+  background-color: rgba(127, 90, 240, 0.15);
+  font-family: var(--font-family);
+}
+
+.msgBar input[type="text"]::placeholder {
+  color: rgba(224, 231, 255, 0.6);
+}
+
+.msgBar input[type="text"]:focus-visible {
+  outline: 2px solid var(--highlight);
+  background-color: rgba(127, 90, 240, 0.3);
+}
+
+.msgBar button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--accent);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--txt);
+  transition: background-color 0.2s ease;
+}
+
+.msgBar button:hover,
+.msgBar button:focus-visible {
+  background-color: var(--highlight);
+  color: var(--bg);
+  outline: none;
+}
+
+.Info {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  width: 44px;        /* Slightly bigger than send button */
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--accent);
+  color: var(--txt);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background-color 0.2s ease;
+  z-index: 1000;
+}
+
+.Info img {
+  width: 24px;    /* Adjust icon size inside to fit nicely */
+  height: 24px;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+
+
+.Info:hover,
+.Info:focus-visible {
+  background-color: var(--highlight);
+  color: var(--bg);
+  outline: none;
+}
+
+/* Notification banner */
+#notifBanner {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 6px 0;
+  font-size: 0.9rem;
+  background-color: var(--highlight);
+  color: var(--bg);
+  text-align: center;
+  user-select: none;
+  cursor: pointer;
+  z-index: 1100;
+}
+
+/* Responsive font sizes */
+@media (max-width: 620px) {
+  #output {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+  .msgBar {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  .msgBar input[type="text"],
+  .msgBar button,
+  .Info {
+    height: 36px;
+    width: 36px;
+    font-size: 0.9rem;
+  }
+  .message {
+    max-width: 90vw;
+    padding: 10px 16px;
+  }
+}

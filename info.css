@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
+
+:root {
+  --bg: #0B0F2D;
+  --txt: #E0E7FF;
+  --accent: #7F5AF0;
+  --highlight: #FFD700;
+}
+
+body {
+  margin: 0;
+  padding: 1rem;
+  background-color: var(--bg);
+  color: var(--txt);
+  font-size: x-large;
+  font-family: 'Kanit', Verdana, Geneva, Tahoma, sans-serif;
+  background-image: url("./assets/background/Symphony_stars.svg");
+  background-attachment: fixed;
+  background-blend-mode: luminosity;
+  background-size: 800px;
+  background-position: 0;
+  background-repeat: repeat;
+  animation: wave-anim 150s linear infinite forwards;
+  text-align: center;
+}
+
+a:link,
+a:visited {
+  color: var(--highlight);
+  text-decoration: none;
+  background-color: transparent;
+}
+
+a:hover {
+  color: var(--txt);
+}
+
+a:active {
+  color: yellow;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  color: var(--txt);
+  font-size: large;
+  font-style: italic;
+  font-weight: 300;
+  text-align: left;
+  background-color: rgba(11, 15, 45, 0.8);
+}
+
+@keyframes wave-anim {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 800px 0;
+  }
+}
