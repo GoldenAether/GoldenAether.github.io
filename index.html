@@ -1,35 +1,257 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-
-  <link rel="manifest" href="./manifest.json" />
-  <link rel="apple-touch-icon" href="./assets/Cosmos-Logo.png" />
-  <link rel="icon" type="image/x-icon" href="./favicon.ico" />
-
-  <title id="title">Cosmos</title>
-
-  <link rel="stylesheet" href="./main.css" />
+  <!-- ===== Document setup ===== -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+  <link rel="stylesheet" href="./main.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Altraia">
+  <meta name="theme-color" content="#2A2247">
+  <meta name="msapplication-navbutton-color" content="#FF43DC">
+  <title id="title">Altraia</title>
+  <link rel="icon" type="image/x-icon" href="./favicon.ico" data-theme-asset="favicon.ico">
 </head>
 <body>
-  <div id="notifBanner" onclick="output.scroll({top: 1000000, left: 0, behavior: 'smooth'})"></div>
-  <audio src="./assets/ping.mp3" id="pinger" preload="auto"></audio>
-  <noscript>Your browser does not support the world of Cosmos!</noscript>
-  <div id="output"></div>
-  <script src="./client.js"></script>
-
-  <button class="Info" onclick="popup_info()"><img src="./assets/info.svg"></button>
-
-  <div class="msgBar">
-    <input type="text" placeholder="Type here to communicate to the universe" id="msg-box" autocomplete="on" autocorrect="on" autocapitalize="on" spellcheck="true" />
-    <button onclick="send()" aria-label="Send">
-      <img src="./assets/send-Arrow.svg" alt="Send" />
-    </button>
+  <!-- ===== Animated background and startup screen ===== -->
+  <canvas id="waterCanvas" aria-hidden="true"></canvas>
+  <div id="startup-overlay" hidden>
+    <img src="./assets/info.png" data-theme-asset="info.png" alt="Altraia Logo" id="startup-logo">
   </div>
+
+  <!-- ===== Login/setup modal ===== -->
+  <div id="loginOverlay" class="modal-overlay">
+    <form id="loginCard" class="modal-card">
+      <h1><img src="./assets/Altraia-Logo.svg" data-theme-asset="Altraia-Logo.svg" alt="Altraia Logo"><br></h1>
+      <div class="setup-row">
+        <label class="pfp-upload-card" for="loginPfp">
+          <img id="loginPfpPreview" class="login-pfp" src="./assets/Cosmos-Logo.png" alt="Profile picture preview">
+        </label>
+        <div class="setup-fields">
+          <input id="loginName" type="text" maxlength="24" placeholder="Username" autocomplete="username" required>
+          <input id="loginPfp" type="file" accept="image/*" hidden>
+          <button class="primary-button" type="submit">Let's Talk</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===== About/info modal ===== -->
+  <div id="infoModal" class="modal-overlay" hidden>
+    <section class="modal-card info-card">
+      <button class="close-button" type="button" data-close="infoModal" aria-label="Close">×</button>
+      <p>
+        <br>
+        <img src="./assets/Altraia-Logo.svg" data-theme-asset="Altraia-Logo.svg" alt="Altraia Logo"><br><br>
+      <p>
+        <br> built off Harmony 1.0.0<br><br>
+        Altraia Client is distributed and maintained by Aether<br><br>
+        Harmony server hosted and maintained by windnedr<br><br>
+        Altraia Build Number: 09182026-1021<br><br>
+        Last Client Update: 09/18/2026<br><br>
+        Altraia Update: Bye, Cosmos - Hello, Colors (version 1.0.2.1)<br><br>
+        thank you @windnedr for the use of the <a href="https://github.com/windnedr/harmony">Harmony</a> server
+      </p>
+      <footer>
+        <p>
+          Harmony 1.0.0 ~ Altraia 1.0.2.1<br>
+          Projekt Altraia by Aether<br>
+          <a href="https://codeberg.org/GoldenAether/Projekt_Altraia">Codeberg</a> ~
+          <a href="https://github.com/GoldenAether/The-Cosmos-Project">Github (Legacy)</a> ~
+          <a href="https://www.youtube.com/@GoldenAetherYT">Youtube</a> ~
+          <a href="https://open.spotify.com/user/31qpuwdihh6wza6hkeyee3qaaw6m?si=52493b0267eb463b">Spotify</a>
+        </p>
+      </footer>
+    </section>
+  </div>
+
+  <!-- ===== Sidebar controls and themes panel ===== -->
+  <div id="sidebar">
+    <!-- Theme and friend choices are created by client.js. -->
+    <div id="themePanel" class="theme-panel">
+      <div class="panel-tabs" role="tablist" aria-label="Sidebar panels">
+        <button class="panel-tab active" type="button" role="tab" aria-selected="true" aria-controls="themesPanel" data-panel="themesPanel">Themes</button>
+        <button class="panel-tab" type="button" role="tab" aria-selected="false" aria-controls="friendsPanel" data-panel="friendsPanel">Friends</button>
+        <button class="panel-tab" type="button" role="tab" aria-selected="false" aria-controls="placeholderTwoPanel" data-panel="placeholderTwoPanel">Settings</button>
+        <button class="panel-tab" type="button" role="tab" aria-selected="false" aria-controls="bioPanel" data-panel="bioPanel">Profile</button>
+        <button class="panel-tab" type="button" role="tab" aria-selected="false" aria-controls="rulesPanel" data-panel="rulesPanel">Rules</button>
+      </div>
+      <section id="themesPanel" class="sidebar-panel active" role="tabpanel">
+        <div id="themeChoices"></div>
+        <div id="customThemeCreator" class="custom-theme-creator">
+          <button id="customThemeToggle" class="custom-theme-toggle" type="button" aria-expanded="false">Create your own theme</button>
+          <form id="customThemeForm" class="custom-theme-form" hidden>
+            <p class="custom-theme-description">Build a calm space with your own colors and a soft background.</p>
+            <div class="custom-theme-colors">
+              <label><span>Background</span><input id="customThemeColorOne" type="color" value="#451700"></label>
+              <label><span>Accent</span><input id="customThemeColorTwo" type="color" value="#F07A18"></label>
+              <label><span>Highlight</span><input id="customThemeColorThree" type="color" value="#F5E38B"></label>
+            </div>
+            <label class="custom-theme-upload" for="customThemeBackground">
+              <span class="custom-theme-upload-icon" aria-hidden="true">＋</span>
+              <span class="custom-theme-upload-copy"><strong>Choose a background</strong><small>JPG, PNG, GIF, or WebP · resized locally</small></span>
+              <span class="custom-theme-upload-action">Browse</span>
+            </label>
+            <input id="customThemeBackground" type="file" accept="image/jpeg,image/png,image/gif,image/webp" hidden>
+            <div id="customThemeBackgroundPreview" class="custom-theme-background-preview" hidden>
+              <img id="customThemeBackgroundImage" alt="Selected background preview">
+              <button id="customThemeBackgroundRemove" type="button" aria-label="Remove background image">×</button>
+            </div>
+            <span id="customThemeFileName" class="custom-theme-file-name">No image selected</span>
+            <div class="custom-theme-actions">
+              <button class="primary-button" type="submit">Use custom theme</button>
+              <button id="customThemeReset" class="secondary-button" type="button">Reset</button>
+            </div>
+          </form>
+        </div>
+      </section>
+      <section id="friendsPanel" class="sidebar-panel" role="tabpanel" hidden>
+        <p id="friendsEmpty">Click a profile picture beside a message to add a friend.</p>
+        <div id="friendsList"></div>
+      </section>
+      <section id="placeholderOnePanel" class="sidebar-panel" role="tabpanel" hidden></section>
+      <section id="placeholderTwoPanel" class="sidebar-panel settings-panel" role="tabpanel" hidden>
+        <div class="settings-group">
+          <h3>Theme &amp; layout</h3>
+          <label class="setting-row" for="darkModeToggle"><span><strong>Dark mode</strong><small>Use deeper, darker colors throughout the app.</small></span><input id="darkModeToggle" type="checkbox" role="switch"></label>
+          <label class="setting-row" for="animatedBackgroundToggle"><span><strong>Animated backgrounds</strong><small>Allow the liquid background to move.</small></span><input id="animatedBackgroundToggle" type="checkbox" role="switch" checked></label>
+          <label class="setting-row" for="disableBlurToggle"><span><strong>Disable blur</strong><small>Turn off blur effects throughout the interface.</small></span><input id="disableBlurToggle" type="checkbox" role="switch"></label>
+          <label class="setting-row" for="reducedMotionToggle"><span><strong>Reduce motion</strong><small>Reduce interface transitions and animated effects.</small></span><input id="reducedMotionToggle" type="checkbox" role="switch"></label>
+          <label class="setting-row" for="compactModeToggle"><span><strong>Compact layout</strong><small>Use tighter spacing for chat and settings.</small></span><input id="compactModeToggle" type="checkbox" role="switch"></label>
+          <label class="setting-control" for="fontSizeSetting"><span><strong>Font size</strong><output id="fontSizeValue">100%</output></span><input id="fontSizeSetting" type="range" min="85" max="135" value="100" step="5"></label>
+        </div>
+        <div class="settings-group">
+          <h3>Notifications &amp; sound</h3>
+          <label class="setting-row" for="silentModeToggle"><span><strong>Silent mode</strong><small>Mute message and server notification sounds.</small></span><input id="silentModeToggle" type="checkbox" role="switch"></label>
+        </div>
+        <div class="settings-group">
+          <h3>Chat behavior</h3>
+          <label class="setting-row" for="autoScrollToggle"><span><strong>Auto-scroll on new messages</strong><small>Stay at the newest message automatically.</small></span><input id="autoScrollToggle" type="checkbox" role="switch" checked></label>
+          <label class="setting-row" for="sendOnEnterToggle"><span><strong>Send with Enter</strong><small>Press Enter to send. Use Shift + Enter for a new line.</small></span><input id="sendOnEnterToggle" type="checkbox" role="switch" checked></label>
+          <label class="setting-row" for="desktopNotificationsToggle"><span><strong>Desktop notifications</strong><small>Show notifications when messages arrive while you are away.</small></span><input id="desktopNotificationsToggle" type="checkbox" role="switch" checked></label>
+          <label class="setting-row" for="showTimestampsToggle"><span><strong>Show message times</strong><small>Display the time each message was sent.</small></span><input id="showTimestampsToggle" type="checkbox" role="switch" checked></label>
+          <label class="setting-row" for="saveDraftsToggle"><span><strong>Save unfinished messages</strong><small>Restore your draft if you leave and return later.</small></span><input id="saveDraftsToggle" type="checkbox" role="switch" checked></label>
+        </div>
+        <div class="settings-group">
+          <h3>Accessibility</h3>
+          <label class="setting-row" for="highContrastToggle"><span><strong>High contrast mode</strong><small>Increase contrast throughout the interface.</small></span><input id="highContrastToggle" type="checkbox" role="switch"></label>
+          <label class="setting-row" for="largeTextToggle"><span><strong>Larger text mode</strong><small>Increase text size and spacing.</small></span><input id="largeTextToggle" type="checkbox" role="switch"></label>
+        </div>
+        <div class="settings-group">
+          <h3>Celebrations &amp; effects</h3>
+          <label class="setting-control" for="confettiColorSetting"><span><strong>Confetti colors</strong><small>Leave blank to follow the active theme.</small></span><input id="confettiColorSetting" type="text" placeholder="Theme colors"></label>
+          <label class="setting-control" for="particleShapeSetting"><span><strong>Particle shape</strong></span><select id="particleShapeSetting"><option value="circles">Circles</option><option value="squares">Squares</option><option value="stars">Stars</option></select></label>
+          <label class="setting-control" for="effectDurationSetting"><span><strong>Duration</strong><output id="effectDurationValue">3s</output></span><input id="effectDurationSetting" type="range" min="1" max="8" value="3"></label>
+          <label class="setting-control" for="effectIntensitySetting"><span><strong>Effect intensity</strong><output id="effectIntensityValue">100%</output></span><input id="effectIntensitySetting" type="range" min="0" max="150" value="100" step="10"></label>
+          <label class="setting-row" for="confettiToggle"><span><strong>🎉 Join confetti</strong><small>Celebrate when someone joins the room.</small></span><input id="confettiToggle" type="checkbox" role="switch"></label>
+          <label class="setting-row" for="mentionConfettiToggle"><span><strong>⭐ Mention confetti</strong></span><input id="mentionConfettiToggle" type="checkbox" role="switch"></label>
+          <label class="setting-row" for="screenShakeToggle"><span><strong>Screen shake on special events</strong></span><input id="screenShakeToggle" type="checkbox" role="switch"></label>
+          <label class="setting-row" for="disableEffectsToggle"><span><strong>Disable all effects</strong></span><input id="disableEffectsToggle" type="checkbox" role="switch"></label>
+          <label class="setting-control" for="bubbleStyleSetting"><span><strong>Chat bubble shape</strong><small>Choose a different silhouette for your messages.</small></span><select id="bubbleStyleSetting"><option value="default">Default</option><option value="square">Square</option><option value="pill">Pill</option><option value="hexagon">Hexagon</option><option value="notched">Notched</option><option value="blob">Blob</option><option value="ticket">Ticket</option><option value="outline">Outline</option><option value="terminal">Terminal</option></select></label>
+        </div>
+        <div class="settings-group">
+          <h3>Privacy</h3>
+          <label class="setting-row" for="mentionOnlyToggle"><span><strong>Mention-only notifications</strong><small>Only notify you for messages that mention your name.</small></span><input id="mentionOnlyToggle" type="checkbox" role="switch"></label>
+          <label class="setting-row" for="notificationPreviewToggle"><span><strong>Show notification previews</strong><small>Include message text in desktop notifications.</small></span><input id="notificationPreviewToggle" type="checkbox" role="switch" checked></label>
+        </div>
+        <div class="settings-group">
+          <h3>Performance</h3>
+          <label class="setting-row" for="showFpsToggle"><span><strong>Show FPS</strong><small>Display the current animation frame rate.</small></span><input id="showFpsToggle" type="checkbox" role="switch"></label>
+        </div>
+        <div class="settings-group settings-device-group">
+          <h3>Device &amp; input</h3>
+          <label class="setting-row" for="touchscreenModeToggle"><span><strong>Touchscreen mode</strong><small>Adjust the layout when an onscreen keyboard is active.</small></span><input id="touchscreenModeToggle" type="checkbox" role="switch"></label>
+        </div>
+        <div class="settings-group settings-danger-zone">
+          <h3>Reset</h3>
+          <p>Delete this app’s saved browser data and restore the default settings.</p>
+          <button id="logoutButton" class="logout-button" type="button">Log out</button>
+          <button id="resetAppDataButton" class="reset-button" type="button">Delete all app data</button>
+        </div>
+      </section>
+      <section id="rulesPanel" class="sidebar-panel rules-panel" role="tabpanel" hidden>
+        <h2>Rules</h2>
+        <p>Coming Soon</p>
+        <!-- Add room rules here later. -->
+      </section>
+      <section id="placeholderThreePanel" class="sidebar-panel" role="tabpanel" hidden></section>
+      <section id="bioPanel" class="sidebar-panel" role="tabpanel" hidden>
+        <div class="bio-heading">
+          <img id="bioProfilePicture" src="./assets/Cosmos-Logo.png" alt="Profile picture">
+          <div>
+            <h2 id="bioTitle">My Profile</h2>
+            <p id="profileStatusPreview" class="profile-status-preview"></p>
+          </div>
+        </div>
+        <div class="profile-card">
+          <label for="statusInput">Status message</label>
+          <input id="statusInput" type="text" maxlength="120" placeholder="What are you up to?">
+          <label for="bioInput">About me</label>
+          <textarea id="bioInput" maxlength="500" placeholder="Tell your friends about yourself..."></textarea>
+          <label for="spotifyInput">Spotify profile or playlist URL</label>
+          <input id="spotifyInput" type="url" placeholder="https://open.spotify.com/...">
+          <label for="notesInput" id="notesLabel">Notes about this friend</label>
+          <textarea id="notesInput" maxlength="1000" placeholder="Your notes about this friend..."></textarea>
+          <button id="openSpotifyButton" class="secondary-button" type="button" hidden>Open Spotify</button>
+          <button id="saveBioButton" class="primary-button" type="button">Save Profile</button>
+          <p id="spotifyPreview" class="spotify-preview"></p>
+          <p id="bioStatus" class="bio-status" aria-live="polite"></p>
+        </div>
+      </section>
+    </div>
+
+    <!-- This is the sidebar/rail: div.menuBtnContainer. -->
+    <div class="menuBtnContainer">
+      <input type="file" accept="image/*" id="pfpUpload" hidden>
+      <button id="pfpButton" type="button" title="Change profile picture" aria-label="Change profile picture">
+        <img id="pfpPreview" src="./assets/Cosmos-Logo.png" alt="Profile picture">
+      </button>
+      <button id="infoButton" type="button" title="About Altraia" aria-label="About Altraia">
+        <img src="./assets/info.png" data-theme-asset="info.png" alt="About Altraia">
+      </button>
+      <button id="themeButton" type="button" title="Themes" aria-expanded="false" aria-label="Open themes">
+        <img src="./assets/theme.png" data-theme-asset="theme.png" alt="Themes">
+      </button>
+      <button id="emojiBtn" type="button" title="Emoji Picker" aria-label="Open emoji picker" aria-haspopup="dialog" aria-expanded="false" onclick="toggleEmojiPopup()">
+        <img src="./assets/emoji.png" data-theme-asset="emoji.png" alt="Emoji">
+      </button>
+      <button id="image_button" type="button" title="Upload Files" aria-label="Upload files">
+        <img src="./assets/file.png" data-theme-asset="file.png" alt="Upload Files">
+      </button>
+      <div class="sidebar-spacer"></div>
+      <p id="roomName"></p>
+    </div>
+
+    <!-- Emoji contents are created by client.js. -->
+    <div id="emojiPopup"></div>
+  </div>
+
+  <!-- ===== Chat output ===== -->
+  <div id="fpsCounter" aria-live="polite" hidden>FPS: --</div>
+
+  <div class="msgWindow">
+    <div id="notifBanner" role="button" tabindex="0" aria-label="Scroll to newest messages"></div>
+    <div id="serverToast" role="status" aria-live="polite"></div>
+    <audio src="./assets/ping.mp3" id="pinger"></audio>
+    <noscript>Your device isnt supported by Altraia!</noscript>
+    <div id="output"></div>
+  </div>
+
+  <!-- ===== Message composer and file upload ===== -->
+  <div class="msgBar">
+    <input id="msg-box" type="text" placeholder="Type to the World" autocomplete="on" autocorrect="on" autocapitalize="on" spellcheck="true">
+    <div id="mentionPicker" class="mention-picker" role="listbox" aria-label="Server members" hidden></div>
+    <button type="button" onclick="send()" aria-label="Send message">
+      <img src="./assets/send-Arrow.svg" alt="Send">
+    </button>
+    <button id="composerMissedButton" type="button" aria-label="No missed messages" aria-disabled="true">0</button>
+    <input id="fileupload" type="file" accept="image/*" hidden>
+  </div>
+
+  <!-- ===== Scripts and font ===== -->
+  <script src="./info.js"></script>
+  <script src="./client.js" defer></script>
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu&subset=cyrillic,latin" rel="stylesheet" type="text/css">
 </body>
 </html>
