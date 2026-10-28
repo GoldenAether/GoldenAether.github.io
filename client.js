@@ -1,4 +1,4 @@
-/ ===== Connection and global state =====
+// ===== Connection and global state =====
 var harmonyVer = "1.0.0"
 
 const wsUri = "ws://74.197.196.228:8080/";
